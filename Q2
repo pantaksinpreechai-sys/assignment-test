@@ -1,1 +1,19 @@
-
+SELECT d.id,
+       d.name
+FROM doctors d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM appointments a
+    WHERE a.doctor_id = d.id
+      AND a.status = 'confirmed'
+      AND a.start_time < '2026-03-19 11:00:00'
+      AND a.end_time > '2026-03-19 10:00:00'
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM doctor_shifts s
+    WHERE s.doctor_id = d.id
+      AND s.shift_type = 'BREAK'
+      AND s.start_time < '2026-03-19 11:00:00'
+      AND s.end_time > '2026-03-19 10:00:00'
+);
