@@ -1,1 +1,23 @@
+## Workflow
 
+```mermaid
+flowchart TD
+    A[Doctor] --> B[Hospital EMR]
+    B --> C[Drug Interaction Service]
+
+    C --> D[Drug Database]
+    C --> E[AI Model]
+
+    D --> F[Risk Evaluation]
+    E --> F
+
+    F --> G{AI Confident?}
+
+    G -->|Yes| H[Display Recommendation]
+    G -->|No / Uncertain| I[Alert Doctor or Pharmacist]
+
+    H --> J[Doctor Dashboard]
+    I --> K[Human Review]
+
+    K --> J
+```
