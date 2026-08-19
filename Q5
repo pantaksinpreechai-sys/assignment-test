@@ -1,1 +1,46 @@
+# Question 5: Lab Results Scalability
 
+## Storage Strategy
+
+Large medical images should not be stored directly inside the
+relational database.
+
+Use Object Storage such as:
+
+- AWS S3
+- Azure Blob Storage
+- MinIO
+
+The database stores metadata such as:
+
+- Patient ID
+- File path / object key
+- File type
+- Created date
+
+The original medical image can be stored in a medical imaging system
+such as PACS using appropriate medical imaging formats such as DICOM.
+
+## Performance
+
+For mobile preview:
+
+- Thumbnail
+- Medium Resolution
+- Full Resolution
+
+Compressed preview images can be used to reduce bandwidth.
+
+For diagnostic images, the original image should be preserved without
+lossy compression that could affect diagnostic quality.
+
+## Internal CDN / Cache
+
+```text
+Doctor Mobile
+      ↓
+API / Authentication
+      ↓
+Internal CDN / Cache
+      ↓
+PACS / Object Storage
