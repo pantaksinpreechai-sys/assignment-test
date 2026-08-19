@@ -1,1 +1,59 @@
+async function claimInsurance(patientId, treatmentCost) {
 
+    const conn = await db.getConnection();
+
+    try {
+        await conn.beginTransaction();
+
+        const [rows] = await conn.query(
+            `
+            SELECT insurance_limit
+            FROM patients
+            WHERE id = ?
+            FOR UPDATE
+            `,
+            [patientId]
+        );
+
+        if (rows.length === 0) {
+            await conn.rollback();
+            return false;
+        }
+
+        const patient = rows[0];
+
+        if (patient.insurance_limit < treatmentCost) {
+            await conn.rollback();
+            return false;
+        }
+
+        await conn.query(
+            `
+            UPDATE patients
+            SET insurance_limit = insurance_limit - ?
+            WHERE id = ?
+            `,
+            [treatmentCost, patientId]
+        );
+
+        await conn.commit();
+
+        return true;
+
+    } catch (error) {
+
+        await conn.rollback();
+        throw error;
+
+    } finally {
+
+        conn.release();
+    }
+}
+Security:
+- Uses parameterized queries (?) to prevent SQL Injection.
+
+Concurrency:
+- Uses a database transaction.
+- SELECT FOR UPDATE locks the patient's row.
+- Concurrent claims for the same patient must wait for the current transaction.
