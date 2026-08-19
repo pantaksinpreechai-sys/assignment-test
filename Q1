@@ -1,1 +1,41 @@
+function getUrgentPatient(queue, currentTime) {
 
+    let bestPatient = null;
+
+    for (const p of queue) {
+
+        const waitMinutes =
+            (currentTime - p.arrivalTime) / 60000;
+
+        let priority;
+
+        // Emergency patients have highest priority
+        if (p.type === 'E') {
+            priority = 2;
+
+        // Normal patients waiting more than 60 minutes
+        // are temporarily promoted to Emergency priority
+        } else if (p.type === 'N' && waitMinutes > 60) {
+            priority = 2;
+
+        } else {
+            priority = 1;
+        }
+
+        if (
+            bestPatient === null ||
+            priority > bestPatient.priority ||
+            (
+                priority === bestPatient.priority &&
+                p.severity > bestPatient.severity
+            )
+        ) {
+            bestPatient = {
+                ...p,
+                priority
+            };
+        }
+    }
+
+    return bestPatient;
+}
